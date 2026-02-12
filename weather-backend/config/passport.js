@@ -1,6 +1,6 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const prisma = require("../prisma");
+const { prisma } = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 
 passport.use(
