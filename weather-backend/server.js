@@ -48,6 +48,11 @@ app.use(limiter);
 // Routes
 app.use("/api/auth", authRoutes);
 
+const passport = require("passport");
+require("./config/passport");
+
+app.use(passport.initialize());
+
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });
