@@ -112,6 +112,7 @@ exports.logout = (req, res) => {
 //   sameSite: "none",
 //   expires: new Date(0)
 // });
+const isProd = process.env.NODE_ENV === "production";
 
 res.cookie("token", "", {
   httpOnly: true,
