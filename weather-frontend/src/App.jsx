@@ -39,6 +39,7 @@ import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import './styles/WeatherApp.css';
 import './styles/global.css';
+import PublicRoute from "./components/PublicRoute";
 
 
 function App() {
@@ -52,7 +53,15 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        {/* <Route path="/" element={<LoginPage />} /> */}
+         <Route
+    path="/"
+    element={
+      <PublicRoute>
+        <LoginPage />
+      </PublicRoute>
+    }
+  />
 
         <Route
           path="/dashboard"
