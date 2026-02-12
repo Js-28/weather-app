@@ -254,7 +254,7 @@ const LoginForm = () => {
   type="button"
   className="btn btn-lg w-100 btn-outline-secondary d-flex align-items-center justify-content-center"
   onClick={() =>
-    (window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`)
+    (window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`)
   }
   style={{
     borderRadius: "12px",

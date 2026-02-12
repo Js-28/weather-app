@@ -21,6 +21,11 @@ app.use(express.json());
 //   credentials: true
 // }));
 
+const passport = require("passport");
+require("./config/passport");
+
+app.use(passport.initialize());
+
 const allowedOrigins = [
   "http://localhost:5173",
   process.env.FRONTEND_URL
@@ -48,10 +53,7 @@ app.use(limiter);
 // Routes
 app.use("/api/auth", authRoutes);
 
-const passport = require("passport");
-require("./config/passport");
 
-app.use(passport.initialize());
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
