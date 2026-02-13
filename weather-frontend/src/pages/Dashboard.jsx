@@ -159,7 +159,7 @@ export default function Dashboard() {
 
   return (
     <div className="home-page-container">
-      <Navbar />
+      <Navbar  onLogout={handleLogout}/>
       <main className="home-page-content">
         <div className="container-lg py-5">
           <section className="current-weather-section mb-5">
