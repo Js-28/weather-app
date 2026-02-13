@@ -144,6 +144,18 @@ export default function Dashboard() {
     }
   }, [dispatch, selectedCity]);
 
+
+
+
+  const navigate = useNavigate();
+
+  // ✅ Logout handler
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    navigate("/", { replace: true });// redirect to login page after logout
+    window.location.replace("/");
+  };
+
   return (
     <div className="home-page-container">
       <Navbar />
