@@ -131,6 +131,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import WeatherIcon from "../components/DashboardComponents/WeatherIcon";
 import { cities } from "../data/weatherData";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const [selectedCity, setSelectedCity] = useState("London");
