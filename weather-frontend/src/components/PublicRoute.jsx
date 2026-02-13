@@ -16,7 +16,6 @@
 // export default PublicRoute;
 
 
-// src/components/PublicRoute.jsx
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
@@ -25,8 +24,9 @@ const PublicRoute = ({ children }) => {
 
   if (checkingAuth) return <div>Loading...</div>;
 
+  // Authenticated users should not access login page
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />; // replace prevents back
+    return <Navigate to="/dashboard" replace />; // ✅ replace prevents back
   }
 
   return children;

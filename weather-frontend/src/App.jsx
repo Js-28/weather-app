@@ -87,6 +87,8 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import RouteGuard from "./components/RouteGuard";
+import GlobalHistoryListener from "./components/GlobalHistoryListener";
+import HistoryLogger from "./components/HistoryLogger";
 
 import "./styles/WeatherApp.css";
 import "./styles/global.css";
@@ -101,7 +103,9 @@ function App() {
   return (
     <Router>
       {/* Global back/forward protection */}
-      <RouteGuard />
+      {/* <RouteGuard /> */}
+        <GlobalHistoryListener />
+        <HistoryLogger />
 
       <Routes>
         {/* Public route */}

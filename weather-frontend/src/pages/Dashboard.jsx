@@ -19,8 +19,12 @@ export default function Dashboard({ onLogout }) {
   // ✅ Logout handler
   const handleLogout = async () => {
     await dispatch(logoutUser());
-    navigate("/"); // redirect to login page after logout
+    navigate("/", { replace: true });// redirect to login page after logout
+
+    window.history.pushState(null, "", "/");
   };
+
+  
 
   return (
     <div className="home-page-container">
