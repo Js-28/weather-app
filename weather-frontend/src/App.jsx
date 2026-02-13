@@ -158,6 +158,8 @@ import AuthLayout from "./layouts/AuthLayout";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import AuthSuccess from "./pages/AuthSuccess";
+import RouteHistoryDebugger from "./pages/RouterHistoryDebugger";
+import RouteDebugger from "./pages/RouterDebugger";
 
 import "./styles/WeatherApp.css";
 import "./styles/global.css";
@@ -181,6 +183,8 @@ function App() {
 
   return (
     <Router>
+      <RouteDebugger />
+        <RouteHistoryDebugger />
       <Routes>
         <Route path="/auth-success" element={<AuthSuccess />} />
 

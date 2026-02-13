@@ -35,7 +35,19 @@ const AuthGate = ({ children, requireAuth }) => {
   const location = useLocation();
 
   // 🚨 do not render anything while checking
-  if (checkingAuth) return null;
+  // if (checkingAuth) return null;
+  if (checkingAuth) {
+  return (
+    <div style={{
+      height: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center"
+    }}>
+      Checking session...
+    </div>
+  );
+}
 
   if (requireAuth && !isAuthenticated) {
     return <Navigate to="/" replace state={{ from: location }} />;
