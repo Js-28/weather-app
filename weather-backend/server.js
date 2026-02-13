@@ -53,7 +53,8 @@ app.use(limiter);
 // Routes
 app.use("/api/auth", authRoutes);
 
-
+const weatherRoutes = require('./routes/weatherRoutes');
+app.use('/api/weather', weatherRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
