@@ -182,6 +182,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/auth-success" element={<AuthSuccess />} />
 
         {/* 🌍 Guest Zone */}
         <Route element={<GuestLayout />}>
@@ -189,9 +190,10 @@ function App() {
         </Route>
 
         {/* 🔐 Authenticated Zone */}
+        
         <Route element={<AuthLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          {/* <Route path="/auth-success" element={<AuthSuccess />} /> */}
+          
         </Route>
 
         {/* Catch All */}
