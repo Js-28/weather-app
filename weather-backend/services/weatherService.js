@@ -27,8 +27,8 @@ async function getWeather({ city, lat, lon }) {
 
 async function getHourlyForecast({ city, lat, lon }) {
   const cacheKey = `hourly-${city || `${lat},${lon}`}`;
-  const cached = getCache(cacheKey);
-  if (cached) return cached;
+//   const cached = getCache(cacheKey);
+//   if (cached) return cached;
 
   let url = '';
   if (lat && lon) {
