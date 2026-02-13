@@ -46,13 +46,25 @@ export default function AuthSuccess() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+//   useEffect(() => {
+//     const completeLogin = async () => {
+//       // hydrate redux from cookie session
+//       await dispatch(fetchMe());
+
+//       // internal navigation (NOT browser reload)
+//       navigate("/dashboard", { replace: true });
+//     };
+
+//     completeLogin();
+//   }, [dispatch, navigate]);
+
   useEffect(() => {
     const completeLogin = async () => {
-      // hydrate redux from cookie session
-      await dispatch(fetchMe());
-
-      // internal navigation (NOT browser reload)
-      navigate("/dashboard", { replace: true });
+      await dispatch(fetchMe()); // hydrate redux from cookie
+      // small delay to ensure cookie is set in the browser
+      setTimeout(() => {
+        navigate("/dashboard", { replace: true });
+      }, 50); // 50ms is enough in almost all cases
     };
 
     completeLogin();

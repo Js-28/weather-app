@@ -22,6 +22,7 @@ export default function Dashboard({ onLogout }) {
   const handleLogout = async () => {
     await dispatch(logoutUser());
     navigate("/", { replace: true });// redirect to login page after logout
+    window.location.replace("/");
   };
 
 
