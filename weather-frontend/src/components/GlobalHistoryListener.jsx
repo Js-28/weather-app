@@ -10,11 +10,13 @@ export default function GlobalHistoryListener() {
     const handlePop = () => {
       if (window.location.pathname === "/dashboard" && !isAuthenticated) {
         // Force redirect immediately if not authenticated
-        navigate("/", { replace: true });
+        console.log("User not authenticated, redirecting to login");
+    window.location.href = "/";
       }
       if (window.location.pathname === "/" && isAuthenticated) {
         // Prevent going back to login after login
-        navigate("/dashboard", { replace: true });
+        console.log("User is authenticated, redirecting to dashboard");
+    window.location.href = "/dashboard";
       }
     };
 
