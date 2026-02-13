@@ -25,9 +25,16 @@ export const fetchMe = createAsyncThunk(
   }
 );
 
+// export const logoutUser = createAsyncThunk(
+//   "auth/logout",
+//   async () => {
+//     await API.post("/auth/logout");
+//   }
+// );
 export const logoutUser = createAsyncThunk(
   "auth/logout",
-  async () => {
+  async (_, thunkAPI) => {
     await API.post("/auth/logout");
+    return; // clears redux state
   }
 );

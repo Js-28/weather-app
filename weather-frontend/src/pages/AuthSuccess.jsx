@@ -64,7 +64,7 @@ export default function AuthSuccess() {
       // small delay to ensure cookie is set in the browser
       setTimeout(() => {
         navigate("/dashboard", { replace: true });
-      }, 50); // 50ms is enough in almost all cases
+      }, 500); // 50ms is enough in almost all cases
     };
 
     completeLogin();
