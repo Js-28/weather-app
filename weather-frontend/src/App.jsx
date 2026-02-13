@@ -166,9 +166,9 @@ function App() {
   const dispatch = useDispatch();
   const { checkingAuth } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    dispatch(fetchMe());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchMe());
+  // }, [dispatch]);
 
 
   if (checkingAuth) {

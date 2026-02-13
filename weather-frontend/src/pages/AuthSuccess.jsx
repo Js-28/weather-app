@@ -15,7 +15,8 @@ export default function AuthSuccess() {
       window.history.replaceState(null, "", "/dashboard");
 
       // 3️⃣ hard navigate (VERY IMPORTANT)
-      window.location.assign("/dashboard");
+    //   window.location.assign("/dashboard");
+    window.location.replace("/dashboard");
 
     };
 

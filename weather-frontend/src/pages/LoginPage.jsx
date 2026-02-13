@@ -8,11 +8,11 @@ import { Navigate } from "react-router-dom";
 
 const LoginPage = () => {
 
-  const { isAuthenticated } = useSelector(state => state.auth);
+  // const { isAuthenticated } = useSelector(state => state.auth);
 
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // if (isAuthenticated) {
+  //   return <Navigate to="/dashboard" replace />;
+  // }
 
   return (
     <div className="container-fluid vh-100">
