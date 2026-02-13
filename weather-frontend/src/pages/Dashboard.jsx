@@ -8,6 +8,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WeatherIcon from '../components/DashboardComponents/WeatherIcon';
 import { cities, weatherData, hourlyForecast } from '../data/weatherData';
+import { useEffect } from "react";
 
 export default function Dashboard({ onLogout }) {
   const [selectedCity, setSelectedCity] = useState('London');
@@ -21,8 +22,15 @@ export default function Dashboard({ onLogout }) {
     await dispatch(logoutUser());
     navigate("/", { replace: true });// redirect to login page after logout
 
-    window.history.pushState(null, "", "/");
   };
+
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get("auth") === "success") {
+    window.history.replaceState(null, "", "/dashboard");
+  }
+}, []);
 
   
 
