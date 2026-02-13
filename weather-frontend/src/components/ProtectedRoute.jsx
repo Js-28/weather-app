@@ -13,16 +13,35 @@
 
 // export default ProtectedRoute;
 
+// import { useSelector } from "react-redux";
+// import { Navigate } from "react-router-dom";
+
+// const ProtectedRoute = ({ children }) => {
+//   const { isAuthenticated, checkingAuth } = useSelector(state => state.auth);
+
+//   if (checkingAuth) return <div>Loading...</div>;
+
+//   if (!isAuthenticated) {
+//     return <Navigate to="/" />;
+//   }
+
+//   return children;
+// };
+
+// export default ProtectedRoute;
+
+
+// src/components/ProtectedRoute.jsx
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, checkingAuth } = useSelector(state => state.auth);
+  const { isAuthenticated, checkingAuth } = useSelector((state) => state.auth);
 
   if (checkingAuth) return <div>Loading...</div>;
 
   if (!isAuthenticated) {
-    return <Navigate to="/" />;
+    return <Navigate to="/" replace />;
   }
 
   return children;

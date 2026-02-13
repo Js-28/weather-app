@@ -266,3 +266,133 @@ body, html {
     letter-spacing: 1.5px;
   }
 }
+
+.home-page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+.navbar-header {
+  background: white;
+  border-bottom: 1px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.navbar-header .navbar {
+  padding: 16px 0;
+}
+
+.navbar-header .navbar-brand {
+  font-size: 18px;
+  color: #1e6b8f !important;
+}
+
+.navbar-header .btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.home-page-content {
+  flex: 1;
+  padding-bottom: 30px;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.weather-card-large {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.weather-card-large:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(30, 107, 143, 0.2) !important;
+}
+
+.weather-details-card {
+  transition: all 0.3s ease;
+}
+
+.weather-details-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+}
+
+.forecast-card {
+  transition: all 0.3s ease;
+}
+
+.forecast-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(30, 107, 143, 0.2) !important;
+}
+
+.form-select {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-select:focus {
+  border-color: #1e6b8f !important;
+  box-shadow: 0 0 0 0.2rem rgba(30, 107, 143, 0.15) !important;
+}
+
+.home-page-footer {
+  background: white;
+  border-top: 1px solid #f0f0f0;
+  margin-top: auto;
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 22px;
+  }
+
+  .weather-card-large {
+    padding: 30px 20px !important;
+  }
+
+  .weather-details-card {
+    margin-top: 20px;
+  }
+
+  .forecast-card {
+    padding: 20px 15px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .home-page-content {
+    padding: 15px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    margin-bottom: 20px !important;
+  }
+
+  .weather-card-large {
+    padding: 25px 15px !important;
+  }
+
+  .weather-details-card {
+    margin-top: 15px;
+  }
+
+  .weather-details-card > div:first-child {
+    padding: 15px !important;
+  }
+
+  .weather-details-card > div:last-child {
+    padding: 15px !important;
+  }
+
+  .forecast-card {
+    padding: 15px 10px !important;
+  }
+}
