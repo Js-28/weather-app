@@ -10,6 +10,7 @@ import WeatherIcon from '../components/DashboardComponents/WeatherIcon';
 import { cities, weatherData, hourlyForecast } from '../data/weatherData';
 import { useEffect } from "react";
 
+
 export default function Dashboard({ onLogout }) {
   const [selectedCity, setSelectedCity] = useState('London');
   const currentWeather = weatherData[selectedCity];
@@ -21,16 +22,9 @@ export default function Dashboard({ onLogout }) {
   const handleLogout = async () => {
     await dispatch(logoutUser());
     navigate("/", { replace: true });// redirect to login page after logout
-
+    // window.history.pushState(null, "", "/");
   };
 
-  useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-
-  if (params.get("auth") === "success") {
-    window.history.replaceState(null, "", "/dashboard");
-  }
-}, []);
 
   
 

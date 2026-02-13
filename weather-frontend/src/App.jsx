@@ -86,9 +86,10 @@ import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
-import RouteGuard from "./components/RouteGuard";
-import GlobalHistoryListener from "./components/GlobalHistoryListener";
-import HistoryLogger from "./components/HistoryLogger";
+// import RouteGuard from "./components/RouteGuard";
+// import GlobalHistoryListener from "./components/GlobalHistoryListener";
+// import HistoryLogger from "./components/HistoryLogger";
+import AuthSuccess from "./pages/AuthSuccess";
 
 import "./styles/WeatherApp.css";
 import "./styles/global.css";
@@ -105,8 +106,8 @@ function App() {
     <Router>
       {/* Global back/forward protection */}
       {/* <RouteGuard /> */}
-        <GlobalHistoryListener />
-        <HistoryLogger />
+        {/* <GlobalHistoryListener />
+        <HistoryLogger /> */}
 
       <Routes>
         {/* Public route */}
@@ -118,6 +119,7 @@ function App() {
             </PublicRoute>
           }
         />
+        <Route path="/auth-success" element={<AuthSuccess />} />
 
         {/* Protected route */}
         <Route
