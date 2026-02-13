@@ -27,27 +27,35 @@
 // export default AuthGate;
 
 
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { fetchMe } from "../features/auth/authThunks";
 
 const AuthGate = ({ children, requireAuth }) => {
+  const dispatch = useDispatch();
   const { isAuthenticated, checkingAuth } = useSelector(state => state.auth);
   const location = useLocation();
 
-  // 🚨 do not render anything while checking
-  // if (checkingAuth) return null;
+  // Only fetchMe if auth not known yet
+  useEffect(() => {
+    if (checkingAuth) {
+      dispatch(fetchMe());
+    }
+  }, [dispatch, checkingAuth]);
+
   if (checkingAuth) {
-  return (
-    <div style={{
-      height: "100vh",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center"
-    }}>
-      Checking session...
-    </div>
-  );
-}
+    return (
+      <div style={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
+      }}>
+        Checking session...
+      </div>
+    );
+  }
 
   if (requireAuth && !isAuthenticated) {
     return <Navigate to="/" replace state={{ from: location }} />;
