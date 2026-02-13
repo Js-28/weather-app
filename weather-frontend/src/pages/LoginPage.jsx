@@ -2,9 +2,18 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import LoginForm from '../features/auth/components/LoginForm';
 import WeatherCard from '../components/WeatherCard';
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 
 
 const LoginPage = () => {
+
+  const { isAuthenticated } = useSelector(state => state.auth);
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return (
     <div className="container-fluid vh-100">
       <div className="row h-100">

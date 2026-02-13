@@ -180,7 +180,7 @@ function App() {
         {/* 🔐 Authenticated Zone */}
         <Route element={<AuthLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/auth-success" element={<AuthSuccess />} />
+          {/* <Route path="/auth-success" element={<AuthSuccess />} /> */}
         </Route>
 
         {/* Catch All */}
