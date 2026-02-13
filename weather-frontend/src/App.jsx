@@ -168,6 +168,15 @@ function App() {
     dispatch(fetchMe());
   }, [dispatch]);
 
+
+  if (checkingAuth) {
+    return (
+      <div style={{ height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <Router>
       <Routes>
