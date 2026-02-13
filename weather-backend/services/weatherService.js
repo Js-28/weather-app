@@ -30,6 +30,8 @@ async function getHourlyForecast({ city, lat, lon }) {
 //   const cached = getCache(cacheKey);
 //   if (cached) return cached;
 
+console.log("called");
+
   let url = '';
   if (lat && lon) {
     url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;

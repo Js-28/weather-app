@@ -130,7 +130,7 @@ import { fetchCurrentWeather, fetchHourlyForecast } from "../features/auth/weath
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import WeatherIcon from "../components/DashboardComponents/WeatherIcon";
-// import { cities } from "../data/weatherData";
+import { cities } from "../data/weatherData";
 
 export default function Dashboard() {
   const [selectedCity, setSelectedCity] = useState("London");
