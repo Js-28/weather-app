@@ -56,6 +56,9 @@ app.use("/api/auth", authRoutes);
 const weatherRoutes = require('./routes/weatherRoutes');
 app.use('/api/weather', weatherRoutes);
 
+const cityRoutes = require('./routes/cityRoutes');
+app.use('/api/cities', cityRoutes);
+
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });
