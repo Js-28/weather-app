@@ -67,7 +67,7 @@ const citiesSlice = createSlice({
       .addCase(fetchCities.pending, (state) => { state.loading = true; })
       .addCase(fetchCities.fulfilled, (state, action) => {
         state.loading = false;
-        state.list = action.payload;
+        state.list = action.payload || [];
       })
       .addCase(fetchCities.rejected, (state, action) => {
         state.loading = false;
