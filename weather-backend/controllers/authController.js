@@ -96,7 +96,8 @@ exports.getMe = async (req, res) => {
       where: { id: req.user },
       select: {
         id: true,
-        email: true
+        email: true,
+        subscribedCity: true,
       }
     });
 

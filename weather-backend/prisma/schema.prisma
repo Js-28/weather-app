@@ -8,9 +8,10 @@ datasource db {
 
 
 model User {
-  id       String  @id @default(uuid())
-  email    String  @unique
-  password String?   
-  provider String?
-  createdAt DateTime @default(now())
+  id             String   @id @default(uuid())
+  email          String   @unique
+  password       String?   
+  provider       String?
+  subscribedCity String?    // NEW: store the currently subscribed city
+  createdAt      DateTime @default(now())
 }

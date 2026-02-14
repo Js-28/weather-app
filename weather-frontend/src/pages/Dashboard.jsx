@@ -275,6 +275,8 @@ import WeatherIcon from "../components/DashboardComponents/WeatherIcon";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../features/auth/authThunks";
 import { fetchCities } from "../features/city/citiesSlice"; 
+import { initSocket, subscribeCity, unsubscribeCity, onNewNotification } from "../utils/socket";
+import { addNotification, setSubscribedCity } from "../features/notification/notificationSlice";
 
 export default function Dashboard() {
   const [selectedCity, setSelectedCity] = useState("");
@@ -287,7 +289,44 @@ export default function Dashboard() {
 
 const { current, hourly, loading, error } = useSelector((state) => state.weather);
 
-  const { list: cities, loading: citiesLoading } = useSelector(state => state.cities);
+const { list: cities, loading: citiesLoading } = useSelector(state => state.cities);
+const { city: subscribedCity } = useSelector(state => state.notifications);
+
+const { id: userId } = useSelector(state => state.auth.user || {});
+
+
+
+const [socket, setSocket] = useState(null);
+
+useEffect(() => {
+  if (!userId || socket) return; // only create socket once
+
+  const s = initSocket(userId);
+  setSocket(s);
+
+  onNewNotification((data) => {
+    dispatch(addNotification(data));
+    if (Notification.permission === "granted") {
+      new Notification(`Weather Update: ${data.city}`, { body: data.message });
+    }
+  });
+
+  return () => {
+    if (socket) socket.disconnect();
+  };
+}, [userId]);
+
+useEffect(() => {
+  if (!socket || !selectedCity) return;
+
+  subscribeCity(selectedCity.name); // don't send userId, backend already knows
+  dispatch(setSubscribedCity(selectedCity.name));
+
+  return () => {
+    unsubscribeCity(); // backend handles via socket auth
+  };
+}, [selectedCity, socket]);
+
 
 // Load top 5 cities on mount
 useEffect(() => {
@@ -324,18 +363,7 @@ useEffect(() => {
     }
   }, [dispatch, selectedCity]);
 
-  // --- City selection overrides geolocation ---
-  // useEffect(() => {
-  //   if (selectedCity) {
-  //     setGeoCoords(null);
-  //     dispatch(fetchCurrentWeather({ city: selectedCity }));
-  //     dispatch(fetchHourlyForecast({ city: selectedCity }));
-  //   } else {
-  //     // ✅ If user selects the default empty option, reset everything
-  //     setGeoCoords(null);
-  //     dispatch(resetWeather());
-  //   }
-  // }, [dispatch, selectedCity]);
+
 
 
   useEffect(() => {
@@ -362,15 +390,6 @@ useEffect(() => {
     window.location.replace("/");
   };
 
-  // const getDayAndDate = () => {
-  //   if (!current) return { day: "", date: "" };
-  //   const timestamp = current.dt ? current.dt * 1000 : Date.now();
-  //   const dateObj = new Date(timestamp);
-  //   const day = dateObj.toLocaleDateString("en-US", { weekday: "long" });
-  //   const date = dateObj.toLocaleDateString("en-GB");
-  //   return { day, date };
-  // };
-
   const getDayAndDate = () => {
   if (!current) return { day: "", date: "" };
 
@@ -395,6 +414,11 @@ useEffect(() => {
 }, []);
 
 
+useEffect(() => {
+  if ("Notification" in window && Notification.permission !== "granted") {
+    Notification.requestPermission();
+  }
+}, []);
 
 
   return (
@@ -411,20 +435,13 @@ useEffect(() => {
               </div>
             )}
 
-            {/* City selector */}
-            {/* <select
-              className="form-select form-select-lg city-select mb-3"
-              value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
-            >
-              <option value="">Select a city</option>
-              {cities.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
-            </select> */}
-            
+             {/* Subscribed city display */}
+  <div className="alert alert-info d-flex align-items-center gap-2">
+    <i className="bi bi-bell-fill"></i>
+    Subscribed city: <strong>{subscribedCity || "None"}</strong>
+  </div>
+
+
 {/* Autocomplete City Search */}
 <div className="position-relative mb-3">
 
@@ -577,6 +594,35 @@ useEffect(() => {
         </div>
       </main>
       <Footer />
+      <div
+  className="position-fixed bottom-0 end-0 p-3"
+  style={{ zIndex: 1050 }}
+>
+  {notifications.length > 0 &&
+    notifications.map((notif, idx) => (
+      <div
+        key={idx}
+        className="toast show align-items-center text-bg-primary border-0 mb-2"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div className="d-flex">
+          <div className="toast-body">
+            <strong>{notif.city}:</strong> {notif.message}
+          </div>
+          <button
+            type="button"
+            className="btn-close btn-close-white me-2 m-auto"
+            onClick={() =>
+              dispatch(removeNotification(idx)) // optional
+            }
+          ></button>
+        </div>
+      </div>
+    ))}
+</div>
+
     </div>
   );
 }
