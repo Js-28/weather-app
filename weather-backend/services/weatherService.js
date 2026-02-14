@@ -93,54 +93,42 @@ async function getWeather({ city, lat, lon }) {
 //   return response.data;
 // }
 
+async function getHourlyForecast({ city, lat, lon, hours = 1 }) {
+  const cacheKey = `hourly-${city || `${lat},${lon}`}-${hours}`;
+  const cached = getCache(cacheKey);
+  if (cached) return cached;
 
-exports.getHourlyForecast = async (req, res) => {
   try {
-    const { city, lat, lon, hours = 1 } = req.query; // default 1 hour
-    const numHours = Math.min(Number(hours), 24); // max 24 to prevent huge requests
-    const cacheKey = `hourly-${city || `${lat},${lon}`}-${numHours}`;
-    const cached = getCache(cacheKey);
-    if (cached) return res.status(200).json(cached);
-
     let coordinates = { lat, lon };
 
-    // If city provided but no lat/lon, fetch coordinates
+    // If city is provided, fetch coordinates
     if (city && (!lat || !lon)) {
-      const geoRes = await axios.get(`http://api.openweathermap.org/geo/1.0/direct`, {
+      const geoRes = await axios.get('http://api.openweathermap.org/geo/1.0/direct', {
         params: { q: city, limit: 1, appid: API_KEY }
       });
-
       if (!geoRes.data || geoRes.data.length === 0) {
-        console.warn(`City not found: ${city}`);
-        return res.status(200).json([]); // return empty array instead of error
+        console.warn(`City "${city}" not found`);
+        return []; // return empty array instead of throwing
       }
       coordinates = { lat: geoRes.data[0].lat, lon: geoRes.data[0].lon };
     }
 
     const { lat: latitude, lon: longitude } = coordinates;
-    const url = `https://api.openweathermap.org/data/2.5/onecall`;
-    const response = await axios.get(url, {
-      params: {
-        lat: latitude,
-        lon: longitude,
-        exclude: 'minutely,daily,alerts,current',
-        units: 'metric',
-        appid: API_KEY,
-      }
-    });
+    const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=minutely,daily,alerts,current&units=metric&appid=${API_KEY}`;
 
-    const hourlyData = Array.isArray(response.data.hourly) 
-      ? response.data.hourly.slice(0, numHours) 
+    const response = await axios.get(url);
+
+    const hourlyData = Array.isArray(response.data?.hourly)
+      ? response.data.hourly.slice(0, hours)
       : [];
 
-    setCache(cacheKey, hourlyData, 5 * 60 * 1000); // cache 5 mins
-    return res.status(200).json(hourlyData);
-
+    setCache(cacheKey, hourlyData, 5 * 60 * 1000);
+    return hourlyData;
   } catch (err) {
     console.error('Hourly forecast fetch error:', err.message);
-    return res.status(200).json([]); // always return array to prevent CORS issues
+    return []; // always return empty array instead of throwing
   }
-};
+}
 
 
 module.exports = { getWeather, getHourlyForecast };
