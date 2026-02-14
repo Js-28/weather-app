@@ -211,7 +211,7 @@ socket.on('unsubscribeCity', async () => {
 const notificationRoutes = require('./routes/notificationRoutes');
 app.use('/api/notifications', notificationRoutes);
 
-const emitWeatherNotifications = require('./utils/emitNotifications');
+const emitWeatherNotifications = require('./utils/emitNotifcations');
 
 // After io.on('connection', ...) block
 emitWeatherNotifications(io, userCityMap);
