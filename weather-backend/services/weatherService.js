@@ -93,34 +93,54 @@ async function getWeather({ city, lat, lon }) {
 //   return response.data;
 // }
 
-async function getHourlyForecast({ city, lat, lon }) {
-  const cacheKey = `hourly-${city || `${lat},${lon}`}`;
-  const cached = getCache(cacheKey);
-  if (cached) return cached;
 
-  let coordinates = { lat, lon };
+exports.hourlyForecast = async (req, res) => {
+  try {
+    const { city, lat, lon, hours = 1 } = req.query; // default 1 hour
+    const numHours = Math.min(Number(hours), 24); // max 24 to prevent huge requests
+    const cacheKey = `hourly-${city || `${lat},${lon}`}-${numHours}`;
+    const cached = getCache(cacheKey);
+    if (cached) return res.status(200).json(cached);
 
-  if (city && (!lat || !lon)) {
-    const geoRes = await axios.get(`http://api.openweathermap.org/geo/1.0/direct`, {
-      params: { q: city, limit: 1, appid: API_KEY }
+    let coordinates = { lat, lon };
+
+    // If city provided but no lat/lon, fetch coordinates
+    if (city && (!lat || !lon)) {
+      const geoRes = await axios.get(`http://api.openweathermap.org/geo/1.0/direct`, {
+        params: { q: city, limit: 1, appid: API_KEY }
+      });
+
+      if (!geoRes.data || geoRes.data.length === 0) {
+        console.warn(`City not found: ${city}`);
+        return res.status(200).json([]); // return empty array instead of error
+      }
+      coordinates = { lat: geoRes.data[0].lat, lon: geoRes.data[0].lon };
+    }
+
+    const { lat: latitude, lon: longitude } = coordinates;
+    const url = `https://api.openweathermap.org/data/2.5/onecall`;
+    const response = await axios.get(url, {
+      params: {
+        lat: latitude,
+        lon: longitude,
+        exclude: 'minutely,daily,alerts,current',
+        units: 'metric',
+        appid: API_KEY,
+      }
     });
-    if (!geoRes.data || geoRes.data.length === 0) throw new Error('City not found');
-    coordinates = { lat: geoRes.data[0].lat, lon: geoRes.data[0].lon };
+
+    const hourlyData = Array.isArray(response.data.hourly) 
+      ? response.data.hourly.slice(0, numHours) 
+      : [];
+
+    setCache(cacheKey, hourlyData, 5 * 60 * 1000); // cache 5 mins
+    return res.status(200).json(hourlyData);
+
+  } catch (err) {
+    console.error('Hourly forecast fetch error:', err.message);
+    return res.status(200).json([]); // always return array to prevent CORS issues
   }
-
-  const { lat: latitude, lon: longitude } = coordinates;
-  const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
-
-  const response = await axios.get(url);
-  if (!response.data || !response.data.hourly) throw new Error('Hourly data not available');
-
-  const nextHourData = Array.isArray(response.data.hourly.slice(0, 1)) 
-    ? response.data.hourly.slice(0, 1) 
-    : [];
-
-  setCache(cacheKey, nextHourData, 5 * 60 * 1000);
-  return nextHourData;
-}
+};
 
 
 module.exports = { getWeather, getHourlyForecast };
