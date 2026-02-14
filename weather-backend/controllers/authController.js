@@ -71,7 +71,7 @@ res.cookie("token", token, {
   httpOnly: true,
   secure: isProd,
   sameSite: isProd ? "none" : "lax",
-  domain: ".weather-app.me",
+  // domain: ".weather-app.me",
   // maxAge: 15 * 60 * 1000
   maxAge: 7 * 24 * 60 * 60 * 1000
 });
@@ -120,7 +120,7 @@ res.cookie("token", "", {
   httpOnly: true,
   secure: isProd,
   sameSite: isProd ? "none" : "lax",
-  domain: ".weather-app.me",
+  // domain: ".weather-app.me",
   expires: new Date(0)
 });
 
