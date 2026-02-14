@@ -276,7 +276,7 @@ import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../features/auth/authThunks";
 import { fetchCities } from "../features/city/citiesSlice"; 
 import { initSocket, subscribeCity, unsubscribeCity, onNewNotification } from "../utils/socket";
-import { addNotification, setSubscribedCity } from "../features/notification/notificationSlice";
+import { addNotification, setSubscribedCity, clearNotifications, removeNotification } from "../features/notifcation/notificationSlice";
 
 export default function Dashboard() {
   const [selectedCity, setSelectedCity] = useState("");
