@@ -29,14 +29,14 @@ exports.currentWeather = async (req, res) => {
 try {
 const { lat, lon } = req.query;
 
-```
+
 if (!lat || !lon) {
   return res.status(400).json({ message: "Coordinates required" });
 }
 
 const data = await getWeather({ lat, lon });
 res.status(200).json(data);
-```
+
 
 } catch (err) {
 console.error(err);
@@ -48,14 +48,13 @@ exports.hourlyForecast = async (req, res) => {
 try {
 const { lat, lon } = req.query;
 
-```
 if (!lat || !lon) {
   return res.status(400).json({ message: "Coordinates required" });
 }
 
 const data = await getHourlyForecast({ lat, lon });
 res.status(200).json(data);
-```
+
 
 } catch (err) {
 console.error(err);
