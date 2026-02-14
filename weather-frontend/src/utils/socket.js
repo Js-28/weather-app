@@ -34,17 +34,24 @@ import { io } from "socket.io-client";
 
 let socket = null;
 
-export const initSocket = (token) => {
-socket = io(import.meta.env.VITE_API_URL.replace("/api",""), {
-transports: ["websocket"],
-withCredentials: true,
-auth: {
-token: token
-}
-});
 
-return socket;
+export const initSocket = (token) => {
+  if (!import.meta.env.VITE_API_URL) {
+    console.error("VITE_API_URL not set!");
+    return null;
+  }
+
+  const backendURL = import.meta.env.VITE_API_URL.replace(/\/api\/?$/, ""); // remove /api at end
+
+  socket = io(backendURL, {
+    transports: ["websocket"],
+    withCredentials: true,
+    auth: { token },
+  });
+
+  return socket;
 };
+
 
 export const subscribeCity = (city) => {
 if (socket) socket.emit("subscribeCity", { city });
