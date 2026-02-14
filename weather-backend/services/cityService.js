@@ -102,7 +102,7 @@ function dedupeCities(cities) {
       const latDiff = Math.abs(existing.lat - c.lat);
       const lonDiff = Math.abs(existing.lon - c.lon);
 
-      if (latDiff < 0.01 && lonDiff < 0.01) {
+      if (latDiff < 0.09 && lonDiff < 0.09) {
         return false; // near duplicate
       } else {
         return true;
@@ -115,8 +115,8 @@ async function getCities(search) {
   if (!search) return [];
 
   const cacheKey = `cities-${search.toLowerCase()}`;
-  const cached = getCache(cacheKey);
-  if (cached) return cached;
+//   const cached = getCache(cacheKey);
+//   if (cached) return cached;
 
   const response = await axios.get("http://api.openweathermap.org/geo/1.0/direct", {
     params: { q: search, limit: 50, appid: API_KEY },
