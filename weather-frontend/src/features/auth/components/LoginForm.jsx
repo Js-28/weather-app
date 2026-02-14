@@ -131,6 +131,8 @@ import { validateLogin } from "../validations/loginValidation";
 import { loginUser } from "../authThunks";
 // import GoogleButton from "./GoogleButton";
 import AuthLoader from "../../../components/Loader";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
@@ -190,10 +192,10 @@ const LoginForm = () => {
 
               <button
                 type="button"
-                className="position-absolute top-50 end-0 translate-middle-y me-3 border-0 bg-transparent"
+                className={`position-absolute translate-middle-y me-3 border-0 bg-transparent ${touched.password && errors.password ? "input-icon-error" : "top-50 end-0"}`}
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? "🙈" : "👁"}
+                {showPassword ? <FaEye size={20} /> : <FaEyeSlash size={20}/>}
               </button>
 
               <ErrorMessage
@@ -215,12 +217,7 @@ const LoginForm = () => {
             ) : (
               <button
                 type="submit"
-                className="btn btn-lg w-100 text-white fw-semibold mb-3"
-                style={{
-                  backgroundColor: "#1e6b8f",
-                  borderRadius: "12px",
-                  padding: "15px",
-                }}
+                className="btn btn-lg w-100 mb-3 primary-btn"
               >
                 Login
               </button>
@@ -252,18 +249,13 @@ const LoginForm = () => {
 
               <button
   type="button"
-  className="btn btn-lg w-100 btn-outline-secondary d-flex align-items-center justify-content-center"
+  className="btn btn-lg w-100 secondary-btn d-flex align-items-center justify-content-center"
   onClick={() =>
     (window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`)
   }
-  style={{
-    borderRadius: "12px",
-    padding: "15px",
-    border: "2px solid #e0e0e0",
-  }}
 >
-  {/* Google SVG */}
-  <span style={{ color: "#1e6b8f" }}>Login with Google</span>
+  <FcGoogle size={25} />
+  <span className="ms-1">Login with Google</span>
 </button>
 
             {/* <GoogleButton /> */}
@@ -275,4 +267,3 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
-

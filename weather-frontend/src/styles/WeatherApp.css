@@ -170,6 +170,71 @@ body, html {
   color: #d4a017;
 }
 
+.login-page {
+  height: 100dvh;
+  width: 100%;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-icon-error {
+  top: 30%;
+  right: 4%;
+}
+
+.primary-btn {
+  border: 2px solid #1e6b8f;
+  background-color: #1e6b8f;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.primary-btn:hover {
+  background-color: #fff;
+  color: #1e6b8f;
+  border: 2px solid #1e6b8f;
+}
+
+.secondary-btn {
+  border: 2px solid #1e6b8f;
+  color: #1e6b8f;
+  background-color: #fff;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.secondary-btn:hover {
+  color: #fff;
+  background-color: #1e6b8f;
+  border: 2px solid #1e6b8f;
+}
+
+.form-control:focus {
+  border-color: #1e6b8f !important;
+  box-shadow: 0 0 0 0.2rem rgba(30, 107, 143, 0.25) !important;
+}
+
+.small-bg-image {
+  background: none;
+}
+
+@media (max-width: 576px) {
+  .small-bg-image {
+    background: linear-gradient(45deg,#fff 0%,#1e6b8f 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100vh;
+    width: 100%;
+  }
+}
+
 @media (max-width: 991px) {
   .weather-card {
     min-height: 40vh;
