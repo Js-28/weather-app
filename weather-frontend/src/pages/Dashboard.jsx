@@ -552,7 +552,7 @@ useEffect(() => {
 
           {/* Hourly forecast */}
           <section className="hourly-forecast-section">
-            {/* {!error && !loading && hourly.length > 0 && (
+            {!error && !loading && hourly.length > 0 && (
               <div>
                 <h2 className="section-title mb-4">Hourly Forecast</h2>
                 <div className="forecast-card overflow-auto">
@@ -571,28 +571,7 @@ useEffect(() => {
                   </div>
                 </div>
               </div>
-            )} */}
-
-            {!error && !loading && hourly.length > 0 && (
-  <div>
-    <h2 className="section-title mb-4">Next Hour Forecast</h2>
-    <div className="forecast-card overflow-auto">
-      <div className="d-flex gap-3 min-w-max">
-        {hourly.map((hour, idx) => (
-          <div key={idx} className="text-center forecast-hour">
-            <div className="weather-icon-hour">
-              <WeatherIcon icon={hour.weather[0].icon} size={32} />
-            </div>
-            <p className="mb-1 fw-bold">{Math.round(hour.temp)}°C</p>
-            <p className="mb-0 text-white-75">
-              {new Date((hour.dt + current.timezone) * 1000).getUTCHours()}:00
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-)}
+            )}
           </section>
         </div>
       </main>
