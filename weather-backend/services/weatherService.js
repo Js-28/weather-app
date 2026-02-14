@@ -94,7 +94,7 @@ async function getWeather({ city, lat, lon }) {
 // }
 
 
-exports.hourlyForecast = async (req, res) => {
+exports.getHourlyForecast = async (req, res) => {
   try {
     const { city, lat, lon, hours = 1 } = req.query; // default 1 hour
     const numHours = Math.min(Number(hours), 24); // max 24 to prevent huge requests
