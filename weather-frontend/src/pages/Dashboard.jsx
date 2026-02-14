@@ -464,7 +464,7 @@ useEffect(() => {
       subscribeCity(cityName);
 
       // Save to DB
-      fetch(`${import.meta.env.VITE_API_URL}/cities/subscribe`, {
+      fetch(`${import.meta.env.VITE_API_URL}/notifications/subscribe`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

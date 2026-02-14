@@ -211,7 +211,7 @@ io.on('connection', async (socket) => {
   socket.join(city);
   userCityMap.set(userId, city);
 
-  await prisma.user.update({ where: { id: userId }, data: { subscribedCity: city } });
+  // await prisma.user.update({ where: { id: userId }, data: { subscribedCity: city } });
   console.log(`User ${userId} subscribed to city: ${city}`);
 });
 
