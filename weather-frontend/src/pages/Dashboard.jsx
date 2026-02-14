@@ -431,6 +431,51 @@ useEffect(() => {
 }, []);
 
 
+useEffect(() => {
+  const fetchSubscribedCity = async () => {
+    if (!userId) return;
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/cities/me`, {
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (data.subscribedCity) {
+        setSelectedCity({ name: data.subscribedCity });
+        dispatch(setSubscribedCity(data.subscribedCity));
+
+        // Emit socket join
+        if (socket) subscribeCity(data.subscribedCity);
+      }
+    } catch (err) {
+      console.error("Failed to fetch subscribed city:", err);
+    }
+  };
+
+  fetchSubscribedCity();
+}, [userId, socket, dispatch]);
+
+
+useEffect(() => {
+  if (geoCoords && socket) {
+    const cityName = current?.name; // assuming `current.name` is returned from weather API
+    if (cityName) {
+      dispatch(setSubscribedCity(cityName));
+      subscribeCity(cityName);
+
+      // Save to DB
+      fetch(`${import.meta.env.VITE_API_URL}/cities/subscribe`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ city: cityName }),
+      }).catch(err => console.error(err));
+    }
+  }
+}, [geoCoords, current, socket, dispatch]);
+
+
+
   return (
     <div className="home-page-container">
       <Navbar onLogout={handleLogout} />
@@ -501,11 +546,34 @@ useEffect(() => {
     key={index}
     type="button"
     className="list-group-item list-group-item-action"
-    onClick={() => {
-      setCityInput(`${city.name}, ${city.country}`);
-      setSelectedCity(city);
-      setShowSuggestions(false);
-    }}
+    // onClick={() => {
+    //   setCityInput(`${city.name}, ${city.country}`);
+    //   setSelectedCity(city);
+    //   setShowSuggestions(false);
+    // }}
+
+    onClick={async () => {
+  setCityInput(`${city.name}, ${city.country}`);
+  setSelectedCity(city);
+  setShowSuggestions(false);
+
+  dispatch(setSubscribedCity(city.name));
+
+  // 1️⃣ API call to update DB
+  try {
+    await fetch(`${import.meta.env.VITE_API_URL}/cities/subscribe`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ city: city.name }),
+    });
+  } catch (err) {
+    console.error("Failed to update subscribed city:", err);
+  }
+
+  // 2️⃣ Emit socket join
+  if (socket) subscribeCity(city.name);
+}}
   >
     {city.name}{city.state ? `, ${city.state}` : ""}, {city.country}
   </button>
