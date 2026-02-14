@@ -325,17 +325,36 @@ useEffect(() => {
   }, [dispatch, selectedCity]);
 
   // --- City selection overrides geolocation ---
+  // useEffect(() => {
+  //   if (selectedCity) {
+  //     setGeoCoords(null);
+  //     dispatch(fetchCurrentWeather({ city: selectedCity }));
+  //     dispatch(fetchHourlyForecast({ city: selectedCity }));
+  //   } else {
+  //     // ✅ If user selects the default empty option, reset everything
+  //     setGeoCoords(null);
+  //     dispatch(resetWeather());
+  //   }
+  // }, [dispatch, selectedCity]);
+
+
   useEffect(() => {
-    if (selectedCity) {
-      setGeoCoords(null);
-      dispatch(fetchCurrentWeather({ city: selectedCity }));
-      dispatch(fetchHourlyForecast({ city: selectedCity }));
-    } else {
-      // ✅ If user selects the default empty option, reset everything
-      setGeoCoords(null);
-      dispatch(resetWeather());
-    }
-  }, [dispatch, selectedCity]);
+  if (selectedCity) {
+    setGeoCoords(null);
+    dispatch(fetchCurrentWeather({
+      lat: selectedCity.lat,
+      lon: selectedCity.lon
+    }));
+    dispatch(fetchHourlyForecast({
+      lat: selectedCity.lat,
+      lon: selectedCity.lon
+    }));
+  } else {
+    setGeoCoords(null);
+    dispatch(resetWeather());
+  }
+}, [dispatch, selectedCity]);
+
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
@@ -343,14 +362,24 @@ useEffect(() => {
     window.location.replace("/");
   };
 
+  // const getDayAndDate = () => {
+  //   if (!current) return { day: "", date: "" };
+  //   const timestamp = current.dt ? current.dt * 1000 : Date.now();
+  //   const dateObj = new Date(timestamp);
+  //   const day = dateObj.toLocaleDateString("en-US", { weekday: "long" });
+  //   const date = dateObj.toLocaleDateString("en-GB");
+  //   return { day, date };
+  // };
+
   const getDayAndDate = () => {
-    if (!current) return { day: "", date: "" };
-    const timestamp = current.dt ? current.dt * 1000 : Date.now();
-    const dateObj = new Date(timestamp);
-    const day = dateObj.toLocaleDateString("en-US", { weekday: "long" });
-    const date = dateObj.toLocaleDateString("en-GB");
-    return { day, date };
-  };
+  if (!current) return { day: "", date: "" };
+
+  // current.timezone is in seconds
+  const localTime = new Date((current.dt + current.timezone) * 1000);
+  const day = localTime.toLocaleDateString("en-US", { weekday: "long" });
+  const date = localTime.toLocaleDateString("en-GB");
+  return { day, date };
+};
 
   const { day, date } = getDayAndDate();
 
@@ -364,6 +393,8 @@ useEffect(() => {
   document.addEventListener("click", handleClickOutside);
   return () => document.removeEventListener("click", handleClickOutside);
 }, []);
+
+
 
 
   return (
@@ -424,20 +455,35 @@ useEffect(() => {
       )}
 
       {!citiesLoading &&
-        cities.map((city) => (
-          <button
-            type="button"
-            key={city}
-            className="list-group-item list-group-item-action"
-            onClick={() => {
-              setCityInput(city);
-              setSelectedCity(city);
-              setShowSuggestions(false);
-            }}
-          >
-            {city}
-          </button>
-        ))}
+        // cities.map((city) => (
+        //   <button
+        //     type="button"
+        //     key={city}
+        //     className="list-group-item list-group-item-action"
+        //     onClick={() => {
+        //       setCityInput(city);
+        //       setSelectedCity(city);
+        //       setShowSuggestions(false);
+        //     }}
+        //   >
+        //     {city}
+        //   </button>
+        // ))
+        cities.map((city, index) => (
+  <button
+    key={index}
+    type="button"
+    className="list-group-item list-group-item-action"
+    onClick={() => {
+      setCityInput(`${city.name}, ${city.country}`);
+      setSelectedCity(city);
+      setShowSuggestions(false);
+    }}
+  >
+    {city.name}{city.state ? `, ${city.state}` : ""}, {city.country}
+  </button>
+))}
+        
     </div>
   )}
 </div>
@@ -518,7 +564,8 @@ useEffect(() => {
                         </div>
                         <p className="mb-1 fw-bold">{Math.round(hour.main.temp)}°C</p>
                         <p className="mb-0 text-white-75">
-                          {new Date(hour.dt * 1000).getHours()}:00
+                          {/* {new Date(hour.dt * 1000).getHours()}:00 */}
+                           {new Date((hour.dt + current.timezone) * 1000).getUTCHours()}:00
                         </p>
                       </div>
                     ))}
