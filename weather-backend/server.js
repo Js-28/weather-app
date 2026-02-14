@@ -125,11 +125,36 @@ const io = new Server(server, {
 // Map to track subscriptions in memory
 const userCityMap = new Map(); // userId => cityName
 
+const jwt = require("jsonwebtoken");
+const { prisma } = require("./models/userModel");
+
+io.use(async (socket, next) => {
+try {
+const token = socket.handshake.auth.token;
+
+if (!token) {
+  return next(new Error("No token"));
+}
+
+const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+socket.userId = decoded.id;
+
+next();
+
+} catch (err) {
+console.log("Socket auth failed");
+next(new Error("Authentication error"));
+}
+});
+
+
 io.on('connection', async (socket) => {
   console.log('New client connected:', socket.id);
 
   // Fetch userId from query (sent from frontend)
-  const { userId } = socket.handshake.auth;
+  // const { userId } = socket.handshake.auth;
+  const userId = socket.userId;
 
   // Auto-subscribe if user has a subscribedCity in DB
   if (userId) {

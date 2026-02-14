@@ -306,7 +306,12 @@ const [socket, setSocket] = useState(null);
 useEffect(() => {
   if (!userId || socket) return; // only create socket once
 
-  const s = initSocket(userId);
+  const token = document.cookie
+  .split("; ")
+  .find(row => row.startsWith("token="))
+  ?.split("=")[1];
+
+  const s = initSocket(token);
   setSocket(s);
 
   onNewNotification((data) => {
