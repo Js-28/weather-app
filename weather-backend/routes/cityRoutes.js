@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { getCityList } = require("../controllers/cityController");
 const { protect } = require("../middleware/authMiddleware");
+const { prisma } = require("../models/userModel");
 
 router.get("/", protect, getCityList);
 
