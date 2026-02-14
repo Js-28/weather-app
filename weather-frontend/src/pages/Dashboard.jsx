@@ -285,7 +285,7 @@ export default function Dashboard() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { current, hourly, loading, error } = useSelector((state) => state.weather);
+const { current, hourly, loading, error } = useSelector((state) => state.weather);
 
   const { list: cities, loading: citiesLoading } = useSelector(state => state.cities);
 
@@ -564,7 +564,8 @@ useEffect(() => {
                         </div>
                         <p className="mb-1 fw-bold">{Math.round(hour.main.temp)}°C</p>
                         <p className="mb-0 text-white-75">
-                          {new Date(hour.dt * 1000).getHours()}:00
+                          {/* {new Date(hour.dt * 1000).getHours()}:00 */}
+                          {new Date((hour.dt + current.timezone) * 1000).getUTCHours()}:00
                         </p>
                       </div>
                     ))}
