@@ -101,22 +101,28 @@ async function getHourlyForecast({ city, lat, lon, hours = 1 }) {
   try {
     let coordinates = { lat, lon };
 
-    // If city is provided, fetch coordinates
     if (city && (!lat || !lon)) {
       const geoRes = await axios.get('http://api.openweathermap.org/geo/1.0/direct', {
         params: { q: city, limit: 1, appid: API_KEY }
       });
+      console.log('Geo response:', geoRes.data);
+
       if (!geoRes.data || geoRes.data.length === 0) {
         console.warn(`City "${city}" not found`);
-        return []; // return empty array instead of throwing
+        return [];
       }
+
       coordinates = { lat: geoRes.data[0].lat, lon: geoRes.data[0].lon };
     }
 
     const { lat: latitude, lon: longitude } = coordinates;
+    console.log('Coordinates:', latitude, longitude);
+
     const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=minutely,daily,alerts,current&units=metric&appid=${API_KEY}`;
+    console.log('Weather API URL:', url);
 
     const response = await axios.get(url);
+    console.log('Hourly data from API:', response.data.hourly?.slice(0, hours));
 
     const hourlyData = Array.isArray(response.data?.hourly)
       ? response.data.hourly.slice(0, hours)
@@ -124,9 +130,10 @@ async function getHourlyForecast({ city, lat, lon, hours = 1 }) {
 
     setCache(cacheKey, hourlyData, 5 * 60 * 1000);
     return hourlyData;
+
   } catch (err) {
     console.error('Hourly forecast fetch error:', err.message);
-    return []; // always return empty array instead of throwing
+    return [];
   }
 }
 
