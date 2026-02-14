@@ -290,7 +290,12 @@ export default function Dashboard() {
 const { current, hourly, loading, error } = useSelector((state) => state.weather);
 
 const { list: cities, loading: citiesLoading } = useSelector(state => state.cities);
-const { city: subscribedCity } = useSelector(state => state.notifications);
+// const { city: subscribedCity } = useSelector(state => state.notifications);
+
+const { list: notifications, city: subscribedCity } = useSelector(
+  (state) => state.notifications || { list: [], city: null }
+);
+
 
 const { id: userId } = useSelector(state => state.auth.user || {});
 
