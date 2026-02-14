@@ -165,6 +165,28 @@ export const fetchCurrentWeather = createAsyncThunk(
   }
 );
 
+// export const fetchHourlyForecast = createAsyncThunk(
+//   "weather/fetchHourly",
+//   async ({ city, lat, lon }, thunkAPI) => {
+//     try {
+//       const queryObj = {};
+//       if (city) queryObj.city = city;
+//       if (lat != null && lon != null) {
+//         queryObj.lat = lat;
+//         queryObj.lon = lon;
+//       }
+//       if (Object.keys(queryObj).length === 0) throw new Error("City or coordinates required");
+
+//       const query = new URLSearchParams(queryObj).toString();
+//       const res = await API.get(`/weather/hourly?${query}`);
+//       return res.data.list;
+//     } catch (err) {
+//       return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
+//     }
+//   }
+// );
+
+
 export const fetchHourlyForecast = createAsyncThunk(
   "weather/fetchHourly",
   async ({ city, lat, lon }, thunkAPI) => {
@@ -179,7 +201,7 @@ export const fetchHourlyForecast = createAsyncThunk(
 
       const query = new URLSearchParams(queryObj).toString();
       const res = await API.get(`/weather/hourly?${query}`);
-      return res.data.list;
+      return res.data; // already only 1 hour
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
     }
