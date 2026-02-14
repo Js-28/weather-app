@@ -115,8 +115,8 @@ async function getCities(search) {
   if (!search) return [];
 
   const cacheKey = `cities-${search.toLowerCase()}`;
-//   const cached = getCache(cacheKey);
-//   if (cached) return cached;
+  const cached = getCache(cacheKey);
+  if (cached) return cached;
 
   const response = await axios.get("http://api.openweathermap.org/geo/1.0/direct", {
     params: { q: search, limit: 50, appid: API_KEY },
