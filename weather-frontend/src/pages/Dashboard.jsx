@@ -492,7 +492,9 @@ navigator.geolocation.getCurrentPosition(
   };
 
   const getDayAndDate = () => {
-  if (!current) return { day: "", date: "" };
+  // if (!current) return { day: "", date: "" };
+  if (!current || current.timezone == null) 
+  return { day: "", date: "" };
 
   // current.timezone is in seconds
   const localTime = new Date((current.dt + current.timezone) * 1000);
@@ -855,7 +857,9 @@ onClick={async () => {
 
           {/* Hourly forecast */}
           <section className="hourly-forecast-section">
-            {!error && !loading && hourly.length > 0 && (
+            {/* {!error && !loading && hourly.length > 0 && ( */}
+            {!error && !loading && current && hourly?.length> 0 && (
+
               <div>
                 <h2 className="section-title mb-4">Hourly Forecast</h2>
                 <div className="forecast-card overflow-auto">
@@ -868,7 +872,8 @@ onClick={async () => {
                         <p className="mb-1 fw-bold">{Math.round(hour.main.temp)}°C</p>
                         <p className="mb-0 text-white-75">
                           {/* {new Date(hour.dt * 1000).getHours()}:00 */}
-                          {new Date((hour.dt + current.timezone) * 1000).getUTCHours()}:00
+                          {/* {new Date((hour.dt + current.timezone) * 1000).getUTCHours()}:00 */}
+                          {new Date((hour.dt + (current?.timezone || 0)) * 1000).getUTCHours()}:00
                         </p>
                       </div>
                     ))}

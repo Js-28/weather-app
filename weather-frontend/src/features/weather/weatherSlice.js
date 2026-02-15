@@ -190,7 +190,7 @@ const weatherSlice = createSlice({
   name: "weather",
   initialState: {
     current: null,
-    hourly: [],
+    hourly: null,
     loading: false,
     error: null,
   },
