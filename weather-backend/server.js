@@ -91,6 +91,10 @@ app.use(
 );
 app.use(express.json());
 
+const passport = require("passport");
+require("./config/passport"); // or wherever GoogleStrategy is defined
+app.use(passport.initialize());
+
 const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
 
 app.use(cors({
