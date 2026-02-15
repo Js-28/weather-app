@@ -277,6 +277,7 @@ import { logoutUser } from "../features/auth/authThunks";
 import { fetchCities } from "../features/city/citiesSlice"; 
 import { initSocket, subscribeCity, unsubscribeCity, onNewNotification } from "../utils/socket";
 import { addNotification, setSubscribedCity, clearNotifications, removeNotification } from "../features/notification/notificationSlice";
+import { FaDroplet, FaWind } from "react-icons/fa6";
 
 export default function Dashboard() {
   const [selectedCity, setSelectedCity] = useState("");
@@ -286,6 +287,8 @@ export default function Dashboard() {
   const [geoDenied, setGeoDenied] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [weatherCity, setWeatherCity] = useState(null);
+const [hydrated, setHydrated] = useState(false);
 
 const { current, hourly, loading, error } = useSelector((state) => state.weather);
 
@@ -326,16 +329,17 @@ useEffect(() => {
   };
 }, [userId]);
 
-useEffect(() => {
-  if (!socket || !selectedCity) return;
+// useEffect(() => {
+//   if (!socket || !selectedCity) return;
 
-  subscribeCity(selectedCity.name); // don't send userId, backend already knows
-  dispatch(setSubscribedCity(selectedCity.name));
+//   subscribeCity(selectedCity.name); // don't send userId, backend already knows
+//   dispatch(setSubscribedCity(selectedCity.name));
 
-  return () => {
-    unsubscribeCity(); // backend handles via socket auth
-  };
-}, [selectedCity, socket]);
+//   return () => {
+//     unsubscribeCity(); // backend handles via socket auth
+//   };
+// }, [selectedCity, socket]);
+
 
 
 // Load top 5 cities on mount
@@ -353,45 +357,132 @@ useEffect(() => {
 }, [cityInput, dispatch]);
 
   // --- Geolocation on mount ---
-  useEffect(() => {
-    if (!selectedCity && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          if (latitude != null && longitude != null) {
-            setGeoCoords({ lat: latitude, lon: longitude });
-            dispatch(fetchCurrentWeather({ lat: Number(latitude), lon: Number(longitude) }));
-            dispatch(fetchHourlyForecast({ lat: Number(latitude), lon: Number(longitude) }));
-          } else {
-            setGeoDenied(true);
-          }
-        },
-        () => setGeoDenied(true)
-      );
-    } else if (!navigator.geolocation) {
-      setGeoDenied(true);
-    }
-  }, [dispatch, selectedCity]);
+  // useEffect(() => {
+  //   if (!selectedCity && navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (pos) => {
+  //         const { latitude, longitude } = pos.coords;
+  //         if (latitude != null && longitude != null) {
+  //           setGeoCoords({ lat: latitude, lon: longitude });
+  //           dispatch(fetchCurrentWeather({ lat: Number(latitude), lon: Number(longitude) }));
+  //           dispatch(fetchHourlyForecast({ lat: Number(latitude), lon: Number(longitude) }));
+  //         } else {
+  //           setGeoDenied(true);
+  //         }
+  //       },
+  //       () => setGeoDenied(true)
+  //     );
+  //   } else if (!navigator.geolocation) {
+  //     setGeoDenied(true);
+  //   }
+  // }, [dispatch, selectedCity]);
 
 
+useEffect(() => {
+  if (!hydrated) return;
+  if (weatherCity) return;
 
-
-  useEffect(() => {
-  if (selectedCity) {
-    setGeoCoords(null);
-    dispatch(fetchCurrentWeather({
-      lat: selectedCity.lat,
-      lon: selectedCity.lon
-    }));
-    dispatch(fetchHourlyForecast({
-      lat: selectedCity.lat,
-      lon: selectedCity.lon
-    }));
-  } else {
-    setGeoCoords(null);
-    dispatch(resetWeather());
+  if (!navigator.geolocation) {
+    setGeoDenied(true);
+    return;
   }
-}, [dispatch, selectedCity]);
+
+//   navigator.geolocation.getCurrentPosition(
+//     async (pos) => {
+//       const { latitude, longitude } = pos.coords;
+
+//       // get city name from weather api
+//       const result = await dispatch(fetchCurrentWeather({ lat: latitude, lon: longitude }));
+//       dispatch(fetchHourlyForecast({ lat: latitude, lon: longitude }));
+
+//       const cityName = result.payload?.name;
+
+//       if (cityName) {
+//         setWeatherCity(cityName);
+//         dispatch(setSubscribedCity(cityName));
+
+//         // save DB
+//         await fetch(`${import.meta.env.VITE_API_URL}/notifications/subscribe`, {
+//           method: "POST",
+//           credentials: "include",
+//           headers: { "Content-Type": "application/json" },
+//          body: JSON.stringify({
+//   city: city.name,
+//   lat: city.lat,
+//   lon: city.lon
+// }),
+//         });
+
+//         if (socket) subscribeCity(cityName);
+//       }
+//     },
+//     () => setGeoDenied(true)
+//   );
+
+navigator.geolocation.getCurrentPosition(
+  async (pos) => {
+    const { latitude, longitude } = pos.coords;
+
+    // Load weather
+    const result = await dispatch(fetchCurrentWeather({
+      lat: latitude,
+      lon: longitude
+    }));
+
+    dispatch(fetchHourlyForecast({
+      lat: latitude,
+      lon: longitude
+    }));
+
+    const detectedCity = result.payload?.name;
+
+    if (detectedCity) {
+      dispatch(setSubscribedCity(detectedCity));
+
+      // save coordinates to DB
+      await fetch(`${import.meta.env.VITE_API_URL}/notifications/subscribe`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          city: detectedCity,
+          lat: latitude,
+          lon: longitude
+        }),
+      });
+
+      if (socket) subscribeCity(detectedCity);
+    }
+  },
+  () => setGeoDenied(true)
+);
+
+}, [hydrated, weatherCity, socket]);
+
+// useEffect(() => {
+//   if (!weatherCity) return;
+
+//   dispatch(fetchCurrentWeather({ city: weatherCity }));
+//   dispatch(fetchHourlyForecast({ city: weatherCity }));
+// }, [weatherCity]);
+
+
+//   useEffect(() => {
+//   if (selectedCity) {
+//     setGeoCoords(null);
+//     dispatch(fetchCurrentWeather({
+//       lat: selectedCity.lat,
+//       lon: selectedCity.lon
+//     }));
+//     dispatch(fetchHourlyForecast({
+//       lat: selectedCity.lat,
+//       lon: selectedCity.lon
+//     }));
+//   } else {
+//     setGeoCoords(null);
+//     dispatch(resetWeather());
+//   }
+// }, [dispatch, selectedCity]);
 
 
   const handleLogout = async () => {
@@ -431,48 +522,125 @@ useEffect(() => {
 }, []);
 
 
+// useEffect(() => {
+//   const fetchSubscribedCity = async () => {
+//     if (!userId) return;
+
+//     try {
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/cities/me`, {
+//         credentials: "include",
+//       });
+//       const data = await res.json();
+//       if (data.subscribedCity) {
+//         setSelectedCity({ name: data.subscribedCity });
+//         dispatch(setSubscribedCity(data.subscribedCity));
+
+//         // Emit socket join
+//         if (socket) subscribeCity(data.subscribedCity);
+//       }
+//     } catch (err) {
+//       console.error("Failed to fetch subscribed city:", err);
+//     }
+//   };
+
+//   fetchSubscribedCity();
+// }, [userId, socket, dispatch]);
+
+
+// useEffect(() => {
+//   const restoreCity = async () => {
+//     if (!userId) return;
+
+//     try {
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/cities/me`, {
+//         credentials: "include",
+//       });
+
+//       const data = await res.json();
+
+//       if (data.subscribedCity) {
+//         // show in bell
+//         dispatch(setSubscribedCity(data.subscribedCity));
+
+//         // show weather ALSO (only if nothing else chosen)
+//         setWeatherCity(data.subscribedCity);
+
+//         if (socket) subscribeCity(data.subscribedCity);
+//       }
+//     } catch (err) {
+//       console.error(err);
+//     } finally {
+//       setHydrated(true);
+//     }
+//   };
+
+//   restoreCity();
+// }, [userId, socket, dispatch]);
+
+
 useEffect(() => {
-  const fetchSubscribedCity = async () => {
+  const restoreCity = async () => {
     if (!userId) return;
 
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/cities/me`, {
         credentials: "include",
       });
-      const data = await res.json();
-      if (data.subscribedCity) {
-        setSelectedCity({ name: data.subscribedCity });
-        dispatch(setSubscribedCity(data.subscribedCity));
 
-        // Emit socket join
-        if (socket) subscribeCity(data.subscribedCity);
+      const data = await res.json();
+
+      if (data.city && data.lat && data.lon) {
+
+        dispatch(setSubscribedCity(data.city));
+
+        dispatch(fetchCurrentWeather({
+          lat: data.lat,
+          lon: data.lon
+        }));
+
+        dispatch(fetchHourlyForecast({
+          lat: data.lat,
+          lon: data.lon
+        }));
+
+        if (socket) subscribeCity(data.city);
+
       }
+
     } catch (err) {
-      console.error("Failed to fetch subscribed city:", err);
+      console.error(err);
+    } finally {
+      setHydrated(true);
     }
   };
 
-  fetchSubscribedCity();
+  restoreCity();
 }, [userId, socket, dispatch]);
 
 
 useEffect(() => {
-  if (geoCoords && socket) {
-    const cityName = current?.name; // assuming `current.name` is returned from weather API
-    if (cityName) {
-      dispatch(setSubscribedCity(cityName));
-      subscribeCity(cityName);
+  if (!socket || !subscribedCity) return;
+  subscribeCity(subscribedCity);
+}, [socket, subscribedCity]);
 
-      // Save to DB
-      fetch(`${import.meta.env.VITE_API_URL}/notifications/subscribe`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ city: cityName }),
-      }).catch(err => console.error(err));
-    }
-  }
-}, [geoCoords, current, socket, dispatch]);
+
+// useEffect(() => {
+//   if (geoCoords && socket) {
+//     const cityName = current?.name; // assuming `current.name` is returned from weather API
+//     if (cityName) {
+//       dispatch(setSubscribedCity(cityName));
+//       subscribeCity(cityName);
+
+//       // Save to DB
+//       fetch(`${import.meta.env.VITE_API_URL}/notifications/subscribe`, {
+//         method: "POST",
+//         credentials: "include",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ city: cityName }),
+//       }).catch(err => console.error(err));
+//     }
+//   }
+// }, [geoCoords, current, socket, dispatch]);
 
 
 
@@ -484,11 +652,17 @@ useEffect(() => {
           <section className="current-weather-section mb-5">
             <h2 className="section-title mb-4">Current Weather</h2>
 
-            {geoDenied && !selectedCity && (
+            {/* {geoDenied && !selectedCity && (
               <div className="alert alert-warning">
                 Location access denied. Please select a city.
               </div>
-            )}
+            )} */}
+
+            {hydrated && geoDenied && !weatherCity && (
+  <div className="alert alert-warning">
+    Location access denied. Please select a city.
+  </div>
+)}
 
              {/* Subscribed city display */}
   <div className="alert alert-info d-flex align-items-center gap-2">
@@ -552,28 +726,65 @@ useEffect(() => {
     //   setShowSuggestions(false);
     // }}
 
-    onClick={async () => {
+//     onClick={async () => {
+//   setCityInput(`${city.name}, ${city.country}`);
+//   setSelectedCity(city);
+//   setShowSuggestions(false);
+
+//   dispatch(setSubscribedCity(city.name));
+
+//   // 1️⃣ API call to update DB
+//   try {
+//     await fetch(`${import.meta.env.VITE_API_URL}/notifications/subscribe`, {
+//       method: "POST",
+//       credentials: "include",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ city: city.name }),
+//     });
+//   } catch (err) {
+//     console.error("Failed to update subscribed city:", err);
+//   }
+
+//   // 2️⃣ Emit socket join
+//   if (socket) subscribeCity(city.name);
+// }}
+
+onClick={async () => {
   setCityInput(`${city.name}, ${city.country}`);
-  setSelectedCity(city);
   setShowSuggestions(false);
 
+  // // weather changes immediately
+  // setWeatherCity(city.name);
+
+    // 1️⃣ LOAD WEATHER USING COORDINATES (REAL LOCATION)
+  dispatch(fetchCurrentWeather({
+    lat: city.lat,
+    lon: city.lon
+  }));
+
+  dispatch(fetchHourlyForecast({
+    lat: city.lat,
+    lon: city.lon
+  }));
+
+  // subscription changes
   dispatch(setSubscribedCity(city.name));
 
-  // 1️⃣ API call to update DB
-  try {
-    await fetch(`${import.meta.env.VITE_API_URL}/cities/subscribe`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ city: city.name }),
-    });
-  } catch (err) {
-    console.error("Failed to update subscribed city:", err);
-  }
+  // save DB
+  await fetch(`${import.meta.env.VITE_API_URL}/notifications/subscribe`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+  city: city.name,
+  lat: city.lat,
+  lon: city.lon
+})
+  });
 
-  // 2️⃣ Emit socket join
   if (socket) subscribeCity(city.name);
 }}
+
   >
     {city.name}{city.state ? `, ${city.state}` : ""}, {city.country}
   </button>
@@ -592,16 +803,15 @@ useEffect(() => {
               <div className="row g-4">
                 {/* Current weather card */}
                 <div className="col-lg-6 col-md-12">
-                  <div className="weather-card-large">
-                    <h3 className="weather-location-name">{current.name}</h3>
-                    <div className="d-flex justify-content-between align-items-start">
-                      <div>
-                        <div className="weather-temp">{Math.round(current.main.temp)}°C</div>
-                        <p className="weather-condition">{current.weather[0].description}</p>
-                      </div>
-                      <div className="weather-icon-large">
-                        <WeatherIcon icon={current.weather[0].icon} size={48} />
-                      </div>
+                  <div className="weather-card-large d-flex justify-content-between align-items-start">
+                    <div>
+                      <h3 className="weather-location-name">{current.name}</h3>
+                      <div className="weather-temp">{Math.round(current.main.temp)}°C</div>
+                      <p className="weather-condition">{current.weather[0].description}</p>
+                    </div>
+                    <div className="weather-icon-large">
+                        <img src={`https://openweathermap.org/payload/api/media/file/${current.weather[0].icon}.png`} />
+                      {/* <WeatherIcon icon={current.weather[0].icon} size={48} /> */}
                     </div>
                   </div>
                 </div>
@@ -609,33 +819,31 @@ useEffect(() => {
                 <div className="col-lg-6 col-md-12">
                   <div className="weather-details-card">
                     <div className="details-header d-flex justify-content-between align-items-center">
-                      <h4>{day}</h4>
-                      <span>{date}</span>
+                      <h5 className="mb-0">{day}</h5>
+                      <h5 className="mb-0">{date}</h5>
                     </div>
                     <div className="details-body">
                       <div className="row mb-3">
-                        <div className="col-6 mb-3">
-                          <div className="detail-item">
-                            <div className="detail-icon">💧</div>
+                        <div className="col-6">
+                          <div className="detail-item mb-0">
+                            <div className="detail-icon"><FaDroplet size={18}/></div>
                             <span>Humidity: {current.main.humidity}%</span>
                           </div>
                         </div>
-                        <div className="col-6 mb-3">
-                          <div className="detail-item">
-                            <div className="detail-icon">💨</div>
+                        <div className="col-6">
+                          <div className="detail-item mb-0">
+                            <div className="detail-icon"><FaWind size={18}/></div>
                             <span>Wind: {current.wind.speed} m/s</span>
                           </div>
                         </div>
                       </div>
-                      <hr />
+                      <hr className="my-4"/>
                       <div className="d-flex justify-content-between">
                         <div className="text-center">
-                          <p className="text-muted mb-1">High</p>
-                          <p className="fw-bold">{Math.round(current.main.temp_max)}°C</p>
+                          <p className="text-muted mb-0">High: <span className="fw-bold"> {Math.round(current.main.temp_max)}°C</span></p>
                         </div>
                         <div className="text-center">
-                          <p className="text-muted mb-1">Low</p>
-                          <p className="fw-bold">{Math.round(current.main.temp_min)}°C</p>
+                          <p className="text-muted mb-0">Low: <span className="fw-bold"> {Math.round(current.main.temp_min)}°C</span></p>
                         </div>
                       </div>
                     </div>

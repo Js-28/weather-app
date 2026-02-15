@@ -10,12 +10,18 @@ router.get("/me", protect, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user },
-      select: { subscribedCity: true }
+      select: {
+  subscribedCity: true,
+  subscribedLat: true,
+  subscribedLon: true
+}
     });
 
-    res.status(200).json({
-      subscribedCity: user?.subscribedCity || null
-    });
+   res.status(200).json({
+  city: user?.subscribedCity || null,
+  lat: user?.subscribedLat || null,
+  lon: user?.subscribedLon || null
+});
 
   } catch (err) {
     console.error("ME ROUTE ERROR:", err);

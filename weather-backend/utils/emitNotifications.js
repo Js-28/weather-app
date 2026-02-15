@@ -25,23 +25,41 @@ function getWeatherMessage(weatherData) {
   return msg;
 }
 
+const { prisma } = require("../models/userModel");
+
 const emitWeatherNotifications = (io, userCityMap) => {
   setInterval(async () => {
     try {
-      const cityMap = new Map(userCityMap); // copy to avoid mutation
-      for (const [userId, city] of cityMap.entries()) {
-        // Fetch current weather for this city
-        const weatherData = await getWeather({ city });
+
+      const users = await prisma.user.findMany({
+        where: {
+          subscribedLat: { not: null },
+          subscribedLon: { not: null }
+        }
+      });
+
+      for (const user of users) {
+
+        const weatherData = await getWeather({
+          lat: user.subscribedLat,
+          lon: user.subscribedLon
+        });
+
         const message = getWeatherMessage(weatherData);
 
-        // Send to all sockets in that city room
-        io.to(city).emit("newNotification", { city, message });
-        console.log(`Notification sent to ${city}: ${message}`);
+        io.to(user.subscribedCity).emit("newNotification", {
+          city: user.subscribedCity,
+          message
+        });
+
+        console.log(`Notification sent to ${user.subscribedCity}: ${message}`);
       }
+
     } catch (err) {
       console.error("Error emitting notifications:", err);
     }
-  },  30 * 1000); // every 15 mins
+  }, 30 * 1000);
 };
+
 
 module.exports = emitWeatherNotifications;

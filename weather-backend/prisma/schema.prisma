@@ -13,5 +13,7 @@ model User {
   password       String?   
   provider       String?
   subscribedCity String?    // NEW: store the currently subscribed city
+  subscribedLat      Float?    // REAL identity
+  subscribedLon      Float? 
   createdAt      DateTime @default(now())
 }
