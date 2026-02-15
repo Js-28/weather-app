@@ -307,27 +307,32 @@ const { id: userId } = useSelector(state => state.auth.user || {});
 const [socket, setSocket] = useState(null);
 
 useEffect(() => {
-  if (!userId || socket) return; // only create socket once
+  if (!userId) return;
 
   const token = document.cookie
-  .split("; ")
-  .find(row => row.startsWith("token="))
-  ?.split("=")[1];
+    .split("; ")
+    .find(row => row.startsWith("token="))
+    ?.split("=")[1];
 
   const s = initSocket(token);
   setSocket(s);
 
-  onNewNotification((data) => {
+  s.on("newNotification", (data) => {
     dispatch(addNotification(data));
+    dispatch(setSubscribedCity(data.city)); // <- KEY FIX
+
     if (Notification.permission === "granted") {
-      new Notification(`Weather Update: ${data.city}`, { body: data.message });
+      new Notification(`Weather Update: ${data.city}`, {
+        body: data.message
+      });
     }
   });
 
   return () => {
-    if (socket) socket.disconnect();
+    s.disconnect();
   };
-}, [userId]);
+}, [userId, dispatch]);
+
 
 // useEffect(() => {
 //   if (!socket || !selectedCity) return;
@@ -605,7 +610,7 @@ useEffect(() => {
           lon: data.lon
         }));
 
-        if (socket) subscribeCity(data.city);
+        // if (socket) subscribeCity(data.city);
 
       }
 
@@ -617,13 +622,19 @@ useEffect(() => {
   };
 
   restoreCity();
-}, [userId, socket, dispatch]);
+}, [userId, dispatch]);
 
 
 useEffect(() => {
   if (!socket || !subscribedCity) return;
   subscribeCity(subscribedCity);
 }, [socket, subscribedCity]);
+
+
+useEffect(() => {
+  if (!current?.name) return;
+  dispatch(setSubscribedCity(current.name));
+}, [current, dispatch]);
 
 
 // useEffect(() => {
@@ -722,34 +733,7 @@ useEffect(() => {
     key={index}
     type="button"
     className="list-group-item list-group-item-action"
-    // onClick={() => {
-    //   setCityInput(`${city.name}, ${city.country}`);
-    //   setSelectedCity(city);
-    //   setShowSuggestions(false);
-    // }}
 
-//     onClick={async () => {
-//   setCityInput(`${city.name}, ${city.country}`);
-//   setSelectedCity(city);
-//   setShowSuggestions(false);
-
-//   dispatch(setSubscribedCity(city.name));
-
-//   // 1️⃣ API call to update DB
-//   try {
-//     await fetch(`${import.meta.env.VITE_API_URL}/notifications/subscribe`, {
-//       method: "POST",
-//       credentials: "include",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ city: city.name }),
-//     });
-//   } catch (err) {
-//     console.error("Failed to update subscribed city:", err);
-//   }
-
-//   // 2️⃣ Emit socket join
-//   if (socket) subscribeCity(city.name);
-// }}
 
 onClick={async () => {
   setCityInput(`${city.name}, ${city.country}`);
